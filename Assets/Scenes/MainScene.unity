@@ -6300,7 +6300,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 1
 --- !u!1001 &641945270
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6641,7 +6641,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 1
 --- !u!1001 &680547000
 PrefabInstance:
   m_ObjectHideFlags: 0
