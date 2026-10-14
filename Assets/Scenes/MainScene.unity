@@ -6593,6 +6593,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a3a65b47df14f4a42b2e5541e1e521a6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 676416833}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a3a65b47df14f4a42b2e5541e1e521a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 676416835}
   m_SourcePrefab: {fileID: 100100000, guid: a3a65b47df14f4a42b2e5541e1e521a6, type: 3}
 --- !u!1 &676416831 stripped
 GameObject:
@@ -6642,6 +6645,28 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 1
+--- !u!114 &676416835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676416831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d8004eae5377418cb7c657387aff69c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonDemo.Gameplay.FootstepAudio
+  animator: {fileID: 676416834}
+  audioSource: {fileID: 746164203}
+  footstepClips:
+  - {fileID: 8300000, guid: 4bf5c7a43047f4d9a903733c96bcbd3c, type: 3}
+  - {fileID: 8300000, guid: 07afcd147a5184de18cda681094b1178, type: 3}
+  - {fileID: 8300000, guid: fdca5d3333bed4f99b6dd850e2910493, type: 3}
+  - {fileID: 8300000, guid: c5537d1290bfb4c45b7f8594784be1ab, type: 3}
+  volume: 0.6
+  crouchVolume: 0.3
+  pitchVariation: 0.05
 --- !u!1001 &680547000
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7212,6 +7237,7 @@ GameObject:
   - component: {fileID: 746164201}
   - component: {fileID: 746164200}
   - component: {fileID: 746164202}
+  - component: {fileID: 746164203}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -7323,6 +7349,103 @@ MonoBehaviour:
     proneHeight: 0.7
     radius: 0.25
     cameraHeight: -0.3
+--- !u!82 &746164203
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746164195}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &774177477
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12319,6 +12442,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 050e32498f37241c0992bb92220e7ce4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1615385873}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 050e32498f37241c0992bb92220e7ce4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1615385874}
     - targetCorrespondingSourceObject: {fileID: 5332809968238436118, guid: 050e32498f37241c0992bb92220e7ce4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 640420983}
@@ -12344,6 +12470,28 @@ MonoBehaviour:
   playerController: {fileID: 746164200}
   runAnimationSpeed: 4
   crawlAnimationSpeed: 1.1
+--- !u!114 &1615385874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18382306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d8004eae5377418cb7c657387aff69c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonDemo.Gameplay.FootstepAudio
+  animator: {fileID: 640420983}
+  audioSource: {fileID: 746164203}
+  footstepClips:
+  - {fileID: 8300000, guid: fc54d43ac83a449ee896a47d0175ee84, type: 3}
+  - {fileID: 8300000, guid: cadd03c5fc62c4867bb85abd83aff785, type: 3}
+  - {fileID: 8300000, guid: 5838bbe2ad56549f598b348c3b98ac3d, type: 3}
+  - {fileID: 8300000, guid: 9904bbb4dda7d4d74b1b2af324667409, type: 3}
+  volume: 0.6
+  crouchVolume: 0.3
+  pitchVariation: 0.05
 --- !u!1001 &1617809693
 PrefabInstance:
   m_ObjectHideFlags: 0
