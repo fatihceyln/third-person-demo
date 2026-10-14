@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/GameMenu.uss" />
+    <ui:VisualElement name="game-menu" class="game-menu game-menu--hidden">
+        <ui:VisualElement class="game-menu__panel">
+            <ui:Label text="Menu" class="game-menu__title" />
+            <ui:Label text="Character" class="game-menu__section" />
+            <ui:VisualElement name="character-list" class="game-menu__character-list" />
+            <ui:Label text="Press Esc to close" class="game-menu__hint" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
