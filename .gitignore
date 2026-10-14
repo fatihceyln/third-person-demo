@@ -1,0 +1,28 @@
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+MemoryCaptures/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+
+# OS files
+.DS_Store
+
+# Unity generated files
+sysinfo.txt
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
