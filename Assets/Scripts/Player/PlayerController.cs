@@ -11,7 +11,9 @@ namespace ArrowGame.Gameplay
         [SerializeField] private CharacterController characterController;
         [SerializeField] private InputActionReference moveAction;
         [SerializeField] private InputActionReference jumpAction;
+        [SerializeField] private InputActionReference sprintAction;
         [SerializeField, Min(0f)] private float moveSpeed = 5f;
+        [SerializeField, Min(0f)] private float sprintSpeed = 9f;
         [SerializeField, Min(0f)] private float jumpHeight = 1.5f;
         [SerializeField, Min(0.01f)] private float gravity = 20f;
 
@@ -20,7 +22,8 @@ namespace ArrowGame.Gameplay
         private void Update()
         {
             var moveInput = moveAction.action.ReadValue<Vector2>();
-            var horizontalVelocity = new Vector3(moveInput.x, 0f, moveInput.y) * moveSpeed;
+            var speed = sprintAction.action.IsPressed() ? sprintSpeed : moveSpeed;
+            var horizontalVelocity = new Vector3(moveInput.x, 0f, moveInput.y) * speed;
 
             if (characterController.isGrounded && verticalVelocity < 0f)
             {

@@ -353,9 +353,11 @@ MonoBehaviour:
   characterController: {fileID: 746164201}
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   jumpAction: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  sprintAction: {fileID: -7471211009204490832, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   moveSpeed: 5
+  sprintSpeed: 9
   jumpHeight: 1.5
-  gravity: 20
+  gravity: 60
 --- !u!143 &746164201
 CharacterController:
   m_ObjectHideFlags: 0
