@@ -84,6 +84,7 @@ namespace ArrowGame.Gameplay
         {
             characterSelector.Select(index);
             RefreshSelection();
+            SetOpen(false);
         }
 
         private void RefreshSelection()
