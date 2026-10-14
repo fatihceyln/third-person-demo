@@ -29,6 +29,7 @@ namespace ArrowGame.Gameplay
 
         [SerializeField] private PlayerController playerController;
         [SerializeField] private ThirdPersonCamera thirdPersonCamera;
+        [SerializeField] private ParticleSystem switchEffect;
         [SerializeField] private Character[] characters;
 
         public int CharacterCount => characters.Length;
@@ -36,7 +37,7 @@ namespace ArrowGame.Gameplay
 
         private void Awake()
         {
-            Select(SelectedIndex);
+            Show(SelectedIndex);
         }
 
         public string GetDisplayName(int index)
@@ -45,6 +46,17 @@ namespace ArrowGame.Gameplay
         }
 
         public void Select(int index)
+        {
+            if (index == SelectedIndex)
+            {
+                return;
+            }
+
+            Show(index);
+            switchEffect.Play();
+        }
+
+        private void Show(int index)
         {
             for (var characterIndex = 0; characterIndex < characters.Length; characterIndex++)
             {
