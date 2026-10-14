@@ -18,8 +18,11 @@ namespace ArrowGame.Gameplay
         [SerializeField, Min(0f)] private float turnSpeed = 720f;
         [SerializeField, Min(0f)] private float jumpHeight = 1.5f;
         [SerializeField, Min(0.01f)] private float gravity = 20f;
+        [SerializeField, Min(0f)] private float edgeSlideSpeed = 3f;
+        [SerializeField] private LayerMask groundLayers;
 
         private float verticalVelocity;
+        private Vector3 groundNormal = Vector3.up;
 
         public float HorizontalSpeed { get; private set; }
         public bool IsGrounded => characterController.isGrounded;
@@ -40,18 +43,52 @@ namespace ArrowGame.Gameplay
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
             }
 
+            // The rounded bottom of the capsule can rest on a ledge corner and still count as grounded, leaving the player hanging in the air.
+            var onEdge = characterController.isGrounded && IsOnEdge();
+
+            if (onEdge)
+            {
+                horizontalVelocity += new Vector3(groundNormal.x, 0f, groundNormal.z).normalized * edgeSlideSpeed;
+            }
+
             if (characterController.isGrounded && verticalVelocity < 0f)
             {
                 verticalVelocity = GroundedVerticalVelocity;
             }
 
-            if (characterController.isGrounded && jumpAction.action.WasPressedThisFrame())
+            if (characterController.isGrounded && !onEdge && jumpAction.action.WasPressedThisFrame())
             {
                 verticalVelocity = Mathf.Sqrt(2f * gravity * jumpHeight);
             }
 
             verticalVelocity -= gravity * Time.deltaTime;
+            groundNormal = Vector3.zero;
             characterController.Move((horizontalVelocity + Vector3.up * verticalVelocity) * Time.deltaTime);
+        }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            // Only contacts on the lower half-sphere are ground; the flattest one wins when several are touched.
+            var bottomSphereHeight = transform.position.y + characterController.center.y - characterController.height / 2f + characterController.radius;
+
+            if (hit.point.y <= bottomSphereHeight && hit.normal.y > groundNormal.y)
+            {
+                groundNormal = hit.normal;
+            }
+        }
+
+        private bool IsOnEdge()
+        {
+            // A flat contact has no direction to slide in. The slope limit is not used here: ledge bevels can be exactly 45 degrees.
+            if (new Vector2(groundNormal.x, groundNormal.z).sqrMagnitude < 0.0001f)
+            {
+                return false;
+            }
+
+            // Stair steps also touch the capsule at an angle, but there is still ground right under its center.
+            var bottomSphereCenter = transform.position + characterController.center + Vector3.down * (characterController.height / 2f - characterController.radius);
+            var probeLength = characterController.radius + characterController.stepOffset + characterController.skinWidth;
+            return !Physics.Raycast(bottomSphereCenter, Vector3.down, probeLength, groundLayers, QueryTriggerInteraction.Ignore);
         }
     }
 }

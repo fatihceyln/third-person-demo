@@ -4759,6 +4759,10 @@ MonoBehaviour:
   turnSpeed: 720
   jumpHeight: 1.5
   gravity: 60
+  edgeSlideSpeed: 3
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 4294967035
 --- !u!143 &746164201
 CharacterController:
   m_ObjectHideFlags: 0
