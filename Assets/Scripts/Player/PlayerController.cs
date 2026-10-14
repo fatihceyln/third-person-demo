@@ -23,7 +23,7 @@ namespace ArrowGame.Gameplay
         {
             var moveInput = moveAction.action.ReadValue<Vector2>();
             var speed = sprintAction.action.IsPressed() ? sprintSpeed : moveSpeed;
-            var horizontalVelocity = new Vector3(moveInput.x, 0f, moveInput.y) * speed;
+            var horizontalVelocity = (transform.right * moveInput.x + transform.forward * moveInput.y) * speed;
 
             if (characterController.isGrounded && verticalVelocity < 0f)
             {
