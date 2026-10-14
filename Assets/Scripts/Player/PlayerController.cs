@@ -21,6 +21,9 @@ namespace ArrowGame.Gameplay
 
         private float verticalVelocity;
 
+        public float HorizontalSpeed { get; private set; }
+        public bool IsGrounded => characterController.isGrounded;
+
         private void Update()
         {
             var moveInput = moveAction.action.ReadValue<Vector2>();
@@ -29,6 +32,7 @@ namespace ArrowGame.Gameplay
             var cameraYaw = Quaternion.Euler(0f, cameraTransform.eulerAngles.y, 0f);
             var moveDirection = cameraYaw * new Vector3(moveInput.x, 0f, moveInput.y);
             var horizontalVelocity = moveDirection * speed;
+            HorizontalSpeed = horizontalVelocity.magnitude;
 
             if (moveDirection != Vector3.zero)
             {

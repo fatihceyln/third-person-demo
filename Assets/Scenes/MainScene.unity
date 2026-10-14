@@ -352,6 +352,33 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &640420981 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5332809968238436118, guid: 050e32498f37241c0992bb92220e7ce4, type: 3}
+  m_PrefabInstance: {fileID: 1615385871}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &640420983
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 640420981}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 7c02df566651349d3a5dd11204daf70f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &746164195
 GameObject:
   m_ObjectHideFlags: 0
@@ -363,6 +390,7 @@ GameObject:
   - component: {fileID: 746164199}
   - component: {fileID: 746164201}
   - component: {fileID: 746164200}
+  - component: {fileID: 746164202}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -433,6 +461,20 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &746164202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746164195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 759d59f6c540945eca947b566eaee81a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArrowGame.Gameplay.PlayerAnimator
+  animator: {fileID: 640420983}
+  playerController: {fileID: 746164200}
 --- !u!1 &1508012613
 GameObject:
   m_ObjectHideFlags: 0
@@ -986,7 +1028,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5332809968238436118, guid: 050e32498f37241c0992bb92220e7ce4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 640420983}
   m_SourcePrefab: {fileID: 100100000, guid: 050e32498f37241c0992bb92220e7ce4, type: 3}
 --- !u!4 &1615385872 stripped
 Transform:
