@@ -9,6 +9,7 @@ namespace ArrowGame.Gameplay
         [Serializable]
         private sealed class Character
         {
+            // Only names the entry in the Inspector list.
             [SerializeField] private string displayName;
             // Each model carries its own Animator and PlayerAnimator, so an inactive model stops animating on its own.
             [SerializeField] private GameObject model;
@@ -19,7 +20,6 @@ namespace ArrowGame.Gameplay
             // Measured from the Player's pivot, which sits 1 m above the feet, so a small character needs a negative value.
             [SerializeField] private float cameraHeight = 0.4f;
 
-            public string DisplayName => displayName;
             public GameObject Model => model;
             public float StandingHeight => standingHeight;
             public float CrouchHeight => crouchHeight;
@@ -34,30 +34,24 @@ namespace ArrowGame.Gameplay
         [SerializeField] private InputActionReference changeCharacterAction;
         [SerializeField] private Character[] characters;
 
-        public int CharacterCount => characters.Length;
-        public int SelectedIndex { get; private set; }
+        private int selectedIndex;
 
         private void Awake()
         {
-            Show(SelectedIndex);
+            Show(selectedIndex);
         }
 
         private void Update()
         {
             if (changeCharacterAction.action.WasPressedThisFrame())
             {
-                Select((SelectedIndex + 1) % characters.Length);
+                Select((selectedIndex + 1) % characters.Length);
             }
         }
 
-        public string GetDisplayName(int index)
+        private void Select(int index)
         {
-            return characters[index].DisplayName;
-        }
-
-        public void Select(int index)
-        {
-            if (index == SelectedIndex)
+            if (index == selectedIndex)
             {
                 return;
             }
@@ -76,7 +70,7 @@ namespace ArrowGame.Gameplay
             var selected = characters[index];
             playerController.SetBodySize(selected.StandingHeight, selected.CrouchHeight, selected.ProneHeight, selected.Radius);
             thirdPersonCamera.SetTargetHeight(selected.CameraHeight);
-            SelectedIndex = index;
+            selectedIndex = index;
         }
     }
 }
