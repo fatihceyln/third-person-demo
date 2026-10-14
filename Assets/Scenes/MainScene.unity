@@ -4809,7 +4809,7 @@ MonoBehaviour:
   animator: {fileID: 640420983}
   playerController: {fileID: 746164200}
   runAnimationSpeed: 4
-  crawlAnimationSpeed: 0.84
+  crawlAnimationSpeed: 1.1
 --- !u!1001 &774177477
 PrefabInstance:
   m_ObjectHideFlags: 0

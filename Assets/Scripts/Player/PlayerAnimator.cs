@@ -16,7 +16,7 @@ namespace ArrowGame.Gameplay
         // The movement speed at which the run clip's feet match the ground; measured from the clip's planted toes.
         [SerializeField, Min(0.01f)] private float runAnimationSpeed = 4f;
         // The movement speed at which the crawl clip's hands match the ground; set by how far a planted hand slides per cycle.
-        [SerializeField, Min(0.01f)] private float crawlAnimationSpeed = 0.84f;
+        [SerializeField, Min(0.01f)] private float crawlAnimationSpeed = 1.1f;
 
         private void Update()
         {
