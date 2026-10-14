@@ -37,7 +37,7 @@ The game design is not set yet. Right now the project is a movement playground: 
 
 1. Open the project with **Unity 6000.6.0f1**.
 2. Open `Assets/Scenes/MainScene.unity` and press **Play**.
-3. Tune movement in the Inspector on `Player` (`Player Controller`), animation speeds on each character model (`Player/Model`, `Player/MiniModel` → `Player Animator`) and the camera on `Main Camera` (`Third Person Camera`).
+3. Tune movement in the Inspector on `Player` (`Player Controller`), each character's collision capsule and camera height on `Player` (`Character Selector`), animation speeds on each character model (`Player/Model`, `Player/MiniModel` → `Player Animator`) and the camera on `Main Camera` (`Third Person Camera`).
 
 ## Project layout
 

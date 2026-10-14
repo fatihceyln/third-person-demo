@@ -25,9 +25,7 @@ namespace ArrowGame.Gameplay
         [SerializeField, Min(0f)] private float moveSpeed = 5f;
         [SerializeField, Min(0f)] private float sprintSpeed = 9f;
         [SerializeField, Min(0f)] private float crouchSpeed = 2.5f;
-        [SerializeField, Min(0.1f)] private float crouchHeight = 1.75f;
         [SerializeField, Min(0f)] private float crawlSpeed = 1f;
-        [SerializeField, Min(0.1f)] private float proneHeight = 0.8f;
         [SerializeField, Min(0f)] private float turnSpeed = 720f;
         [SerializeField, Min(0f)] private float jumpHeight = 1.5f;
         [SerializeField, Min(0.01f)] private float gravity = 20f;
@@ -36,20 +34,16 @@ namespace ArrowGame.Gameplay
 
         private float verticalVelocity;
         private Vector3 groundNormal = Vector3.up;
+        // Set by the selected character through SetBodySize, so each character has its own capsule.
         private float standingHeight;
-        private Vector3 standingCenter;
+        private float crouchHeight;
+        private float proneHeight;
         private Stance stance;
 
         public float HorizontalSpeed { get; private set; }
         public bool IsGrounded => characterController.isGrounded;
         public bool IsCrouching => stance == Stance.Crouching;
         public bool IsProne => stance == Stance.Prone;
-
-        private void Awake()
-        {
-            standingHeight = characterController.height;
-            standingCenter = characterController.center;
-        }
 
         private void Update()
         {
@@ -117,14 +111,18 @@ namespace ArrowGame.Gameplay
             }
         }
 
+        public void SetBodySize(float standing, float crouching, float prone, float radius)
+        {
+            standingHeight = standing;
+            crouchHeight = crouching;
+            proneHeight = prone;
+            characterController.radius = radius;
+            SetHeight(HeightFor(stance));
+        }
+
         private void TrySetStance(Stance target)
         {
-            var height = target switch
-            {
-                Stance.Crouching => crouchHeight,
-                Stance.Prone => proneHeight,
-                _ => standingHeight,
-            };
+            var height = HeightFor(target);
 
             // Rising under something low would push the capsule into it, so the player stays down.
             if (height > characterController.height && !HasRoomFor(height))
@@ -133,8 +131,24 @@ namespace ArrowGame.Gameplay
             }
 
             stance = target;
-            characterController.height = height;
+            SetHeight(height);
+        }
+
+        private float HeightFor(Stance target)
+        {
+            return target switch
+            {
+                Stance.Crouching => crouchHeight,
+                Stance.Prone => proneHeight,
+                _ => standingHeight,
+            };
+        }
+
+        private void SetHeight(float height)
+        {
+            // The center is worked out from the current capsule, so it must change before the height does.
             characterController.center = CenterFor(height);
+            characterController.height = height;
         }
 
         private bool HasRoomFor(float height)
@@ -148,8 +162,9 @@ namespace ArrowGame.Gameplay
 
         private Vector3 CenterFor(float height)
         {
-            // The capsule shrinks from the top so the feet stay on the ground.
-            return standingCenter + Vector3.down * ((standingHeight - height) / 2f);
+            // The capsule keeps its bottom where it is so the feet stay on the ground.
+            var bottom = characterController.center + Vector3.down * (characterController.height / 2f);
+            return bottom + Vector3.up * (height / 2f);
         }
 
         private bool IsOnEdge()

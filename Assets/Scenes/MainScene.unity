@@ -4280,7 +4280,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArrowGame.Gameplay.PlayerAnimator
   animator: {fileID: 676416834}
   playerController: {fileID: 746164200}
-  runAnimationSpeed: 2.1
+  runAnimationSpeed: 5
   crawlAnimationSpeed: 1.1
 --- !u!95 &676416834
 Animator:
@@ -4920,9 +4920,7 @@ MonoBehaviour:
   moveSpeed: 5
   sprintSpeed: 8
   crouchSpeed: 2.5
-  crouchHeight: 1.75
   crawlSpeed: 1
-  proneHeight: 0.8
   turnSpeed: 720
   jumpHeight: 1.5
   gravity: 60
@@ -4967,11 +4965,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e48a1bf7f259a4d4085420026a658729, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArrowGame.Gameplay.CharacterSelector
+  playerController: {fileID: 746164200}
+  thirdPersonCamera: {fileID: 1972415398}
   characters:
   - displayName: Skater
     model: {fileID: 18382306}
+    standingHeight: 2
+    crouchHeight: 1.75
+    proneHeight: 0.8
+    radius: 0.4
+    cameraHeight: 0.4
   - displayName: Bearded
     model: {fileID: 676416831}
+    standingHeight: 1
+    crouchHeight: 0.92
+    proneHeight: 0.7
+    radius: 0.25
+    cameraHeight: -0.3
 --- !u!1 &759964638
 GameObject:
   m_ObjectHideFlags: 0
@@ -12105,7 +12115,7 @@ Transform:
   m_GameObject: {fileID: 1972415393}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: -3.5}
+  m_LocalPosition: {x: 0, y: 1.471, z: -3.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12172,7 +12182,6 @@ MonoBehaviour:
   lookSensitivity: 0.8
   maxLookUpAngle: 50
   maxLookDownAngle: 45
-  targetHeight: 0.6
   offset: {x: 0, y: 0.4, z: -3.5}
   positionSmoothTime: 0.1
   rotationSharpness: 15

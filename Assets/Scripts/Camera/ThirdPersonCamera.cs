@@ -10,13 +10,14 @@ namespace ArrowGame.Gameplay
         [SerializeField, Min(0f)] private float lookSensitivity = 0.1f;
         [SerializeField, Range(0f, 90f)] private float maxLookUpAngle = 50f;
         [SerializeField, Range(0f, 90f)] private float maxLookDownAngle = 45f;
-        [SerializeField, Min(0f)] private float targetHeight = 0.6f;
         [SerializeField] private Vector3 offset = new Vector3(0f, 0.4f, -3.5f);
         [SerializeField, Min(0f)] private float positionSmoothTime = 0.1f;
         [SerializeField, Min(0f)] private float rotationSharpness = 15f;
         [SerializeField] private LayerMask collisionLayers;
         [SerializeField, Min(0f)] private float collisionRadius = 0.2f;
 
+        // Set by the selected character through SetTargetHeight, so the camera looks at each character's own height.
+        private float targetHeight;
         private float yaw;
         private float pitch;
         private float smoothedYaw;
@@ -69,6 +70,11 @@ namespace ArrowGame.Gameplay
         private void OnDisable()
         {
             Cursor.lockState = CursorLockMode.None;
+        }
+
+        public void SetTargetHeight(float height)
+        {
+            targetHeight = height;
         }
     }
 }
