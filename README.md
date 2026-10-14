@@ -1,4 +1,4 @@
-# Arrow Game
+# Third Person Demo
 
 A third-person 3D prototype built with **Unity 6**. Like its sibling project Blackhole, it is also an experiment in **agentic game development**: the code, scene edits, Inspector wiring and even the custom animations were made by AI agents, guided by a human who designs, play-tests and decides.
 
@@ -64,7 +64,7 @@ Press **E** to switch to the next character. Key hints sit in the bottom-right c
 | `Assets/Models/` | Kenney model packs, one folder per pack |
 | `Assets/Materials/` | Character skin and the white puff material |
 | `Assets/UI/` | Key-hint HUD layout (UXML), styles (USS) and Panel Settings |
-| `Assets/Editor/` | Project validator (**Tools → ArrowGame → Validate Project**) |
+| `Assets/Editor/` | Project validator (**Tools → ThirdPersonDemo → Validate Project**) |
 | `Tools/agent/` | Helper scripts the agents use to verify their changes |
 | `docs/screenshots/` | Images for this README |
 

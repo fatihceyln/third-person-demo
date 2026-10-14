@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ArrowGame.Gameplay
+namespace ThirdPersonDemo.Gameplay
 {
     public sealed class PlayerAnimator : MonoBehaviour
     {

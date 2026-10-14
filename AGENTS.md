@@ -2,10 +2,10 @@
 
 ## Project overview
 
-- An arrow game built with Unity **6000.6.0f1**. Render pipeline: URP (Universal Renderer, `PC_Renderer` / `Mobile_Renderer`).
+- Third Person Demo: a third-person character demo built with Unity **6000.6.0f1**. Render pipeline: URP (Universal Renderer, `PC_Renderer` / `Mobile_Renderer`).
 - The game design is not defined yet. When it is, describe the core loop, main scene and system wiring here.
 - Main scene: `Assets/Scenes/MainScene.unity` (the only scene in the Build Profiles scene list).
-- Game scripts live in the `ArrowGame.Gameplay` namespace; editor tools live in `ArrowGame.EditorTools` under `Assets/Editor/`.
+- Game scripts live in the `ThirdPersonDemo.Gameplay` namespace; editor tools live in `ThirdPersonDemo.EditorTools` under `Assets/Editor/`.
 
 ### Folder structure
 
@@ -125,7 +125,7 @@
 
 - Commit and push only when the user asks.
 - Each topic gets its own commit; do not put unrelated changes in the same commit.
-- Commit messages are in English, short and in the imperative mood (e.g. `Add arrow trail effect`).
+- Commit messages are in English, short and in the imperative mood (e.g. `Add footstep dust effect`).
 - Dynamic font atlas changes in `Assets/UI/Fonts/*-SDF.asset` files are generated automatically by Unity; do not commit them unless the user asks.
 
 ## Verification
@@ -133,5 +133,5 @@
 - Do not add automated tests.
 - Run `Tools/agent/unity-check.py mark` before changing the project and `check` after. Do not report a task as done while `check` shows problems. Revert any changed file that the task did not mean to change.
 - `Tools/agent/code-guard.py` catches code patterns forbidden by these rules. It runs automatically after Claude Code edits (`.claude/settings.json` hook) and inside `check`. Fix the violation; add `// agent-guard: allow <reason>` to a line only for a real exception.
-- `check` also runs the Unity project validator (Tools > ArrowGame > Validate Project), which reports unassigned or empty Inspector fields on game scripts, missing scripts, broken references and prefab overrides in scenes. Fix its errors; confirm that reported overrides are intentional.
+- `check` also runs the Unity project validator (Tools > ThirdPersonDemo > Validate Project), which reports unassigned or empty Inspector fields on game scripts, missing scripts, broken references and prefab overrides in scenes. Fix its errors; confirm that reported overrides are intentional.
 - The agent does not run Play Mode tests; the user does the play testing. After `check` is clean, tell the user in short steps what to test in Play Mode and how.

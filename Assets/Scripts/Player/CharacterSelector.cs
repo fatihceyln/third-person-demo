@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace ArrowGame.Gameplay
+namespace ThirdPersonDemo.Gameplay
 {
     public sealed class CharacterSelector : MonoBehaviour
     {

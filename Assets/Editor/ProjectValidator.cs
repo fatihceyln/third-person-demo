@@ -7,18 +7,18 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
-namespace ArrowGame.EditorTools
+namespace ThirdPersonDemo.EditorTools
 {
     /// <summary>
     /// Finds setup mistakes in scenes, prefabs and data assets before Play Mode:
     /// unassigned or empty Inspector fields on game scripts, missing scripts,
     /// broken references, prefab overrides in scenes and UI element names that do not exist in the UXML.
-    /// Run it from Tools > ArrowGame > Validate Project, or from the CLI with
-    /// <c>unity command eval "return ArrowGame.EditorTools.ProjectValidator.RunAsText();"</c>.
+    /// Run it from Tools > ThirdPersonDemo > Validate Project, or from the CLI with
+    /// <c>unity command eval "return ThirdPersonDemo.EditorTools.ProjectValidator.RunAsText();"</c>.
     /// </summary>
     public static class ProjectValidator
     {
-        private const string GameNamespace = "ArrowGame.Gameplay";
+        private const string GameNamespace = "ThirdPersonDemo.Gameplay";
         private const string SceneFolder = "Assets/Scenes";
         private const string PrefabFolder = "Assets/Prefabs";
         private const string DataFolder = "Assets/Data";
@@ -62,7 +62,7 @@ namespace ArrowGame.EditorTools
             return text.ToString();
         }
 
-        [MenuItem("Tools/ArrowGame/Validate Project")]
+        [MenuItem("Tools/ThirdPersonDemo/Validate Project")]
         private static void ValidateFromMenu()
         {
             var issues = Validate();

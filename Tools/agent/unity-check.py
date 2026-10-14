@@ -129,12 +129,12 @@ def check():
         problems += guard.returncode != 0
 
     # Setup mistakes (empty Inspector fields, missing scripts, broken references) only show up in Unity.
-    print("\n== Project validator (Tools > ArrowGame > Validate Project)")
+    print("\n== Project validator (Tools > ThirdPersonDemo > Validate Project)")
 
     if compile_failed or playing:
         print("Skipped: needs a successful compile and Edit Mode.")
     else:
-        report = run_eval("return ArrowGame.EditorTools.ProjectValidator.RunAsText();", timeout=120)
+        report = run_eval("return ThirdPersonDemo.EditorTools.ProjectValidator.RunAsText();", timeout=120)
         print(report if report is not None else "Could not run the validator.")
         problems += report is None or report.count("ERROR ") > 0
 
