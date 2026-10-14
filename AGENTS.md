@@ -4,7 +4,7 @@
 
 - An arrow game built with Unity **6000.6.0f1**. Render pipeline: URP (Universal Renderer, `PC_Renderer` / `Mobile_Renderer`).
 - The game design is not defined yet. When it is, describe the core loop, main scene and system wiring here.
-- Main scene: `Assets/Scenes/SampleScene.unity` (from the project template).
+- There is no scene yet. When the main scene is created, name it here and add it to the Build Profiles scene list.
 - Game scripts live in the `ArrowGame.Gameplay` namespace; editor tools live in `ArrowGame.EditorTools` under `Assets/Editor/`.
 
 ### Folder structure
