@@ -23,6 +23,7 @@
 | `Assets/Settings/` | Unity/URP project settings assets only; game data does not go here |
 | `Assets/Editor/` | Editor-only tools, not included in builds (e.g. `ProjectValidator.cs`) |
 | `Tools/agent/` | Helper scripts for agents (outside `Assets/`, so Unity does not import them) |
+| `docs/screenshots/` | Screenshots used by `README.md` |
 
 - Put a new script in the matching feature folder; if none fits, create a new feature folder.
 - Empty folders hold a `.gitkeep` file so git keeps them; Unity ignores dot files. Remove it once the folder has content.
