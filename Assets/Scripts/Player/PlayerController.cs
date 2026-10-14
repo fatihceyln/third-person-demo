@@ -9,11 +9,13 @@ namespace ArrowGame.Gameplay
         private const float GroundedVerticalVelocity = -2f;
 
         [SerializeField] private CharacterController characterController;
+        [SerializeField] private Transform cameraTransform;
         [SerializeField] private InputActionReference moveAction;
         [SerializeField] private InputActionReference jumpAction;
         [SerializeField] private InputActionReference sprintAction;
         [SerializeField, Min(0f)] private float moveSpeed = 5f;
         [SerializeField, Min(0f)] private float sprintSpeed = 9f;
+        [SerializeField, Min(0f)] private float turnSpeed = 720f;
         [SerializeField, Min(0f)] private float jumpHeight = 1.5f;
         [SerializeField, Min(0.01f)] private float gravity = 20f;
 
@@ -23,7 +25,16 @@ namespace ArrowGame.Gameplay
         {
             var moveInput = moveAction.action.ReadValue<Vector2>();
             var speed = sprintAction.action.IsPressed() ? sprintSpeed : moveSpeed;
-            var horizontalVelocity = (transform.right * moveInput.x + transform.forward * moveInput.y) * speed;
+            // Movement follows the camera's heading so W always walks away from the camera.
+            var cameraYaw = Quaternion.Euler(0f, cameraTransform.eulerAngles.y, 0f);
+            var moveDirection = cameraYaw * new Vector3(moveInput.x, 0f, moveInput.y);
+            var horizontalVelocity = moveDirection * speed;
+
+            if (moveDirection != Vector3.zero)
+            {
+                var targetRotation = Quaternion.LookRotation(moveDirection);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+            }
 
             if (characterController.isGrounded && verticalVelocity < 0f)
             {
