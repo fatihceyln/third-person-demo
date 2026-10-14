@@ -11877,7 +11877,7 @@ MonoBehaviour:
   rotationSharpness: 15
   collisionLayers:
     serializedVersion: 2
-    m_Bits: 4294967035
+    m_Bits: 51
   collisionRadius: 0.2
 --- !u!1001 &1975238072
 PrefabInstance:
