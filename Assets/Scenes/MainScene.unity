@@ -475,6 +475,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArrowGame.Gameplay.PlayerAnimator
   animator: {fileID: 640420983}
   playerController: {fileID: 746164200}
+  runAnimationSpeed: 4
 --- !u!1 &1508012613
 GameObject:
   m_ObjectHideFlags: 0
