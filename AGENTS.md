@@ -14,6 +14,7 @@
 | `Assets/Scripts/<Feature>/` | Scripts grouped by feature |
 | `Assets/Data/` | The project's ScriptableObject assets |
 | `Assets/Prefabs/` | Prefabs |
+| `Assets/Models/<Pack>/` | 3D models with their textures and license, one folder per source pack (e.g. `KenneyProtagonists`) |
 | `Assets/Materials/`, `Assets/Shaders/` | Materials and shaders |
 | `Assets/Audio/` | Audio files |
 | `Assets/UI/` | UXML, USS, Panel Settings, fonts, themes and UI icons |
