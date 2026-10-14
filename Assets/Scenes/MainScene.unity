@@ -4754,15 +4754,21 @@ MonoBehaviour:
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   jumpAction: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   sprintAction: {fileID: -7471211009204490832, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  crouchAction: {fileID: 7040659881675835329, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  proneAction: {fileID: -2417471175696382170, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   moveSpeed: 5
   sprintSpeed: 8
+  crouchSpeed: 2.5
+  crouchHeight: 1.75
+  crawlSpeed: 1
+  proneHeight: 0.8
   turnSpeed: 720
   jumpHeight: 1.5
   gravity: 60
   edgeSlideSpeed: 3
   groundLayers:
     serializedVersion: 2
-    m_Bits: 4294967035
+    m_Bits: 51
 --- !u!143 &746164201
 CharacterController:
   m_ObjectHideFlags: 0
@@ -4803,6 +4809,7 @@ MonoBehaviour:
   animator: {fileID: 640420983}
   playerController: {fileID: 746164200}
   runAnimationSpeed: 4
+  crawlAnimationSpeed: 0.84
 --- !u!1001 &774177477
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11868,7 +11875,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArrowGame.Gameplay.ThirdPersonCamera
   target: {fileID: 746164199}
   lookAction: {fileID: -5630151704836100654, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  lookSensitivity: 0.4
+  lookSensitivity: 0.8
   maxLookUpAngle: 50
   maxLookDownAngle: 45
   targetHeight: 0.6
