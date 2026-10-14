@@ -66,6 +66,8 @@ namespace ArrowGame.Gameplay
         {
             isOpen = open;
             menu.EnableInClassList(hiddenClassName, !open);
+            // The character can also change with a key while the menu is closed.
+            RefreshSelection();
             var gameplayActions = inputActions.FindActionMap(gameplayActionMap, true);
 
             if (open)

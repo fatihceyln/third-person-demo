@@ -32,6 +32,7 @@ The game design is not set yet. Right now the project is a movement playground: 
 | **Space** | Jump |
 | **C** | Crouch / stand up |
 | **X** | Go prone / stand up |
+| **E** | Switch to the next character |
 | **Esc** | Open / close the menu (switch characters) |
 
 ## Characters
@@ -41,7 +42,7 @@ The game design is not set yet. Right now the project is a movement playground: 
 | **Skater** | Kenney Animated Characters Protagonists | 2 m |
 | **Bearded** | Kenney Mini Characters (`character-male-b`) | 1 m |
 
-Press **Esc** and pick a character. The switch happens inside a puff of white cloud. Each character has its own collision capsule, camera height and animation speeds, so a small character also fits through smaller gaps.
+Press **E** to switch to the next character, or press **Esc** and pick one from the menu. Key hints sit in the bottom-right corner of the screen. The switch happens inside a puff of white cloud. Each character has its own collision capsule, camera height and animation speeds, so a small character also fits through smaller gaps.
 
 ## Getting started
 
@@ -64,7 +65,7 @@ Press **Esc** and pick a character. The switch happens inside a puff of white cl
 | `Assets/Animations/` | Animator Controller, the mini character's override controller and the generated crouch and prone clips |
 | `Assets/Models/` | Kenney model packs, one folder per pack |
 | `Assets/Materials/` | Character skin and the white puff material |
-| `Assets/UI/` | Esc menu layout (UXML), styles (USS) and Panel Settings |
+| `Assets/UI/` | Esc menu and key-hint HUD layouts (UXML), styles (USS) and Panel Settings |
 | `Assets/Editor/` | Project validator (**Tools → ArrowGame → Validate Project**) |
 | `Tools/agent/` | Helper scripts the agents use to verify their changes |
 | `docs/screenshots/` | Images for this README |

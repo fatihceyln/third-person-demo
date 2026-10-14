@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace ArrowGame.Gameplay
 {
@@ -30,6 +31,7 @@ namespace ArrowGame.Gameplay
         [SerializeField] private PlayerController playerController;
         [SerializeField] private ThirdPersonCamera thirdPersonCamera;
         [SerializeField] private ParticleSystem switchEffect;
+        [SerializeField] private InputActionReference changeCharacterAction;
         [SerializeField] private Character[] characters;
 
         public int CharacterCount => characters.Length;
@@ -38,6 +40,14 @@ namespace ArrowGame.Gameplay
         private void Awake()
         {
             Show(SelectedIndex);
+        }
+
+        private void Update()
+        {
+            if (changeCharacterAction.action.WasPressedThisFrame())
+            {
+                Select((SelectedIndex + 1) % characters.Length);
+            }
         }
 
         public string GetDisplayName(int index)

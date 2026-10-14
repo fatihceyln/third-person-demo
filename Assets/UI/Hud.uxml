@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Hud.uss" />
+    <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+        <ui:VisualElement class="hud__item" picking-mode="Ignore">
+            <ui:Label text="Shift" class="hud__key" picking-mode="Ignore" />
+            <ui:Label text="Sprint" class="hud__label" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement class="hud__item" picking-mode="Ignore">
+            <ui:Label text="C" class="hud__key" picking-mode="Ignore" />
+            <ui:Label text="Crouch" class="hud__label" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement class="hud__item" picking-mode="Ignore">
+            <ui:Label text="X" class="hud__key" picking-mode="Ignore" />
+            <ui:Label text="Crawl" class="hud__label" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement class="hud__item hud__item--last" picking-mode="Ignore">
+            <ui:Label text="E" class="hud__key" picking-mode="Ignore" />
+            <ui:Label text="Change character" class="hud__label" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
