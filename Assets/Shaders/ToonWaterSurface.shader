@@ -17,6 +17,11 @@ Shader "ThirdPersonDemo/ToonWaterSurface"
         _ShineSpeed ("Shine Speed", Range(0, 1)) = 0.12
         _ShineWaveAmount ("Shine Wave Amount", Range(0, 0.5)) = 0.12
         _ShineWaveFrequency ("Shine Wave Frequency", Range(0, 30)) = 9
+        _SparkleColor ("Sparkle Color", Color) = (1, 1, 1, 1)
+        _SparkleDensity ("Sparkle Density", Range(2, 30)) = 10
+        _SparkleAmount ("Sparkle Amount", Range(0, 1)) = 0.35
+        _SparkleSize ("Sparkle Size", Range(0, 0.5)) = 0.22
+        _SparkleSpeed ("Sparkle Speed", Range(0, 3)) = 0.6
     }
 
     SubShader
@@ -57,6 +62,11 @@ Shader "ThirdPersonDemo/ToonWaterSurface"
                 half _ShineSpeed;
                 half _ShineWaveAmount;
                 half _ShineWaveFrequency;
+                half4 _SparkleColor;
+                half _SparkleDensity;
+                half _SparkleAmount;
+                half _SparkleSize;
+                half _SparkleSpeed;
             CBUFFER_END
 
             // The GPU Resident Drawer reads material values from here, not from the cbuffer.
@@ -76,6 +86,11 @@ Shader "ThirdPersonDemo/ToonWaterSurface"
                     UNITY_DOTS_INSTANCED_PROP(float, _ShineSpeed)
                     UNITY_DOTS_INSTANCED_PROP(float, _ShineWaveAmount)
                     UNITY_DOTS_INSTANCED_PROP(float, _ShineWaveFrequency)
+                    UNITY_DOTS_INSTANCED_PROP(float4, _SparkleColor)
+                    UNITY_DOTS_INSTANCED_PROP(float, _SparkleDensity)
+                    UNITY_DOTS_INSTANCED_PROP(float, _SparkleAmount)
+                    UNITY_DOTS_INSTANCED_PROP(float, _SparkleSize)
+                    UNITY_DOTS_INSTANCED_PROP(float, _SparkleSpeed)
                 UNITY_DOTS_INSTANCING_END(MaterialPropertyMetadata)
 
                 #define _DeepColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _DeepColor)
@@ -92,6 +107,11 @@ Shader "ThirdPersonDemo/ToonWaterSurface"
                 #define _ShineSpeed UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ShineSpeed)
                 #define _ShineWaveAmount UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ShineWaveAmount)
                 #define _ShineWaveFrequency UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ShineWaveFrequency)
+                #define _SparkleColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _SparkleColor)
+                #define _SparkleDensity UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _SparkleDensity)
+                #define _SparkleAmount UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _SparkleAmount)
+                #define _SparkleSize UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _SparkleSize)
+                #define _SparkleSpeed UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _SparkleSpeed)
             #endif
 
             struct Attributes
@@ -114,6 +134,11 @@ Shader "ThirdPersonDemo/ToonWaterSurface"
                 output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
                 output.uv = input.uv;
                 return output;
+            }
+
+            float Hash21(float2 value)
+            {
+                return frac(sin(dot(value, float2(127.1, 311.7))) * 43758.5453);
             }
 
             half4 frag(Varyings input) : SV_Target
@@ -149,6 +174,21 @@ Shader "ThirdPersonDemo/ToonWaterSurface"
                 // Keep the foam rim clean.
                 float shineArea = saturate((insideDistance - _FoamWidth) / max(fwidth(insideDistance), 1e-5));
                 color = lerp(color, _ShineColor.rgb, shine * shineArea * _ShineColor.a);
+
+                // Each grid cell may hold one small four-point star that grows and fades on its own cycle.
+                float2 sparkleUV = input.uv * _SparkleDensity;
+                float2 sparkleCell = floor(sparkleUV);
+                // Keeping the center away from the cell border stops stars from being clipped by the neighbor cell.
+                float2 sparkleCenter = 0.25 + 0.5 * float2(Hash21(sparkleCell), Hash21(sparkleCell + 19.19));
+                float sparkleActive = step(Hash21(sparkleCell + 91.7), _SparkleAmount);
+                float sparkleCycle = frac(_Time.y * _SparkleSpeed + Hash21(sparkleCell + 17.3));
+                float sparkleRadius = _SparkleSize * sin(sparkleCycle * 3.14159) * sparkleActive;
+                // The sum of square roots draws a four-point star (an astroid) around the center.
+                float2 sparkleOffset = abs(frac(sparkleUV) - sparkleCenter);
+                float starValue = sqrt(sparkleOffset.x) + sqrt(sparkleOffset.y);
+                float starEdge = max(fwidth(starValue), 1e-4);
+                float sparkle = saturate((sqrt(sparkleRadius) - starValue) / starEdge);
+                color = lerp(color, _SparkleColor.rgb, sparkle * shineArea * _SparkleColor.a);
 
                 return half4(color, 1.0);
             }
