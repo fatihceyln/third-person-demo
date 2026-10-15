@@ -29,13 +29,18 @@ namespace ThirdPersonDemo.Gameplay
         {
             yaw = transform.eulerAngles.y;
             smoothedYaw = yaw;
-            followPoint = target.position + Vector3.up * targetHeight;
         }
 
         private void OnEnable()
         {
             // Keeps the mouse in the game window so turning is never stopped by the screen edge.
             Cursor.lockState = CursorLockMode.Locked;
+        }
+
+        private void Start()
+        {
+            // Runs after every Awake, so the selected character has already set targetHeight and the camera does not slide up on the first frames.
+            followPoint = target.position + Vector3.up * targetHeight;
         }
 
         private void LateUpdate()

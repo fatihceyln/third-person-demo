@@ -6664,8 +6664,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 07afcd147a5184de18cda681094b1178, type: 3}
   - {fileID: 8300000, guid: fdca5d3333bed4f99b6dd850e2910493, type: 3}
   - {fileID: 8300000, guid: c5537d1290bfb4c45b7f8594784be1ab, type: 3}
-  volume: 0.6
-  crouchVolume: 0.3
+  volume: 0.3
+  crouchVolume: 0.2
   pitchVariation: 0.05
 --- !u!1001 &680547000
 PrefabInstance:
@@ -12489,8 +12489,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: cadd03c5fc62c4867bb85abd83aff785, type: 3}
   - {fileID: 8300000, guid: 5838bbe2ad56549f598b348c3b98ac3d, type: 3}
   - {fileID: 8300000, guid: 9904bbb4dda7d4d74b1b2af324667409, type: 3}
-  volume: 0.6
-  crouchVolume: 0.3
+  volume: 0.3
+  crouchVolume: 0.2
   pitchVariation: 0.05
 --- !u!1001 &1617809693
 PrefabInstance:
