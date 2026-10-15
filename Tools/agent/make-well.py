@@ -4,7 +4,8 @@ Run with Blender in background mode:
   blender -b -P Tools/agent/make-well.py -- <out.fbx> [out.blend] [preview_dir]
 
 Every face is UV-mapped to one flat color cell of the Kenney Mini Arena colormap, so the well
-shares the palette (and the material) of the rest of the arena.
+shares the palette (and the material) of the rest of the arena. The water is the exception: it gets
+its own "water" material and UVs that span the shaft opening, so a toon water shader can fill it.
 """
 import math
 import os
@@ -29,7 +30,6 @@ CELLS = {
     "wood": (400, 400),
     "wood_light": (336, 400),
     "roof": (272, 300),
-    "water": (336, 300),
 }
 
 # Dimensions in meters. The character is ~1.9 m tall, so the rim sits around waist height.
@@ -104,6 +104,12 @@ def rect_polygon_xy(center_x, center_y, half_x, half_y, z):
             (center_x + half_x, center_y + half_y, z), (center_x - half_x, center_y + half_y, z)]
 
 
+def make_water_material():
+    material = bpy.data.materials.new("water")
+    material.diffuse_color = (0.045, 0.76, 0.87, 1.0)
+    return material
+
+
 def make_material():
     material = bpy.data.materials.new("colormap")
     material.use_nodes = True
@@ -135,8 +141,17 @@ def make_part(name, material, build):
     return obj
 
 
+def planar_uv(bm, half_extent):
+    """Top-down projection that maps the square [-half_extent, half_extent] onto the UV unit square."""
+    uv_layer = bm.loops.layers.uv.verify()
+    for face in bm.faces:
+        for loop in face.loops:
+            loop[uv_layer].uv = (loop.vert.co.x / (2 * half_extent) + 0.5, loop.vert.co.y / (2 * half_extent) + 0.5)
+
+
 def build_well():
     material = make_material()
+    water_material = make_water_material()
     rim_bottom = WELL_HEIGHT + RIM_HEIGHT
     post_height = POST_TOP - rim_bottom
 
@@ -148,8 +163,9 @@ def build_well():
         add_ring_prism(bm, RIM_RADIUS, RIM_HOLE_RADIUS, WELL_HEIGHT, rim_bottom, "stone_light")
 
     def water(bm):
-        # Water and shaft floor, so the opening does not look hollow from above.
-        add_prism(bm, circle_polygon(WELL_HOLE_RADIUS, WATER_LEVEL - 0.05), (0.0, 0.0, 0.05), "water")
+        # Fills the shaft opening exactly; the UVs span the octagon's bounding square for the toon water shader.
+        add_prism(bm, circle_polygon(WELL_HOLE_RADIUS, WATER_LEVEL - 0.05), (0.0, 0.0, 0.05), "stone")
+        planar_uv(bm, WELL_HOLE_RADIUS)
 
     def posts(bm):
         for side in (-1.0, 1.0):
@@ -171,7 +187,7 @@ def build_well():
 
     return [
         make_part("body", material, stone_body),
-        make_part("water", material, water),
+        make_part("water", water_material, water),
         make_part("posts", material, posts),
         make_part("beam", material, beam),
         make_part("roof", material, roof),
