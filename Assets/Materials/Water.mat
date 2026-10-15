@@ -47,7 +47,7 @@ Material:
     - _EdgeWobbleSpeed: 0.8
     - _FoamWidth: 0.03
     - _Opacity: 0.85
-    - _PitDepth: 0.231
+    - _PitDepth: 0.102
     - _QueueOffset: 0
     - _Radius: 0.42
     - _RimWidth: 0.012
@@ -62,6 +62,8 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _WaterInset: 0.06
+    - _WaterWobble: 0.015
+    - _WaterWobbleSpeed: 1.51
     - _WobbleSeed: 1.7
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
