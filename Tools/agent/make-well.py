@@ -41,9 +41,11 @@ RIM_HOLE_RADIUS = 0.74
 RIM_HEIGHT = 0.12
 WATER_LEVEL = 0.65
 POST_SIZE = 0.16
+POST_X = 0.9
 POST_TOP = 2.05
 BEAM_HEIGHT = 1.55
-BEAM_RADIUS = 0.09
+# Must stay below POST_SIZE / 2 so the beam fits inside the posts.
+BEAM_RADIUS = 0.07
 ROOF_EAVE_HEIGHT = 2.0
 ROOF_RIDGE_HEIGHT = 2.65
 ROOF_HALF_WIDTH = 0.8
@@ -151,14 +153,14 @@ def build_well():
 
     def posts(bm):
         for side in (-1.0, 1.0):
-            add_prism(bm, rect_polygon_xy(side * 0.9, 0.0, POST_SIZE / 2, POST_SIZE / 2, rim_bottom),
+            add_prism(bm, rect_polygon_xy(side * POST_X, 0.0, POST_SIZE / 2, POST_SIZE / 2, rim_bottom),
                       (0.0, 0.0, post_height), "wood")
 
     def beam(bm):
-        # Windlass beam along X.
-        polygon = [(-1.0, BEAM_RADIUS * math.cos(angle), BEAM_HEIGHT + BEAM_RADIUS * math.sin(angle))
+        # Windlass beam along X. It ends at the post centers, so both ends are buried inside the posts.
+        polygon = [(-POST_X, BEAM_RADIUS * math.cos(angle), BEAM_HEIGHT + BEAM_RADIUS * math.sin(angle))
                    for angle in [math.tau * index / 6 for index in range(6)]]
-        add_prism(bm, polygon, (2.0, 0.0, 0.0), "wood_light")
+        add_prism(bm, polygon, (2 * POST_X, 0.0, 0.0), "wood_light")
 
     def roof(bm):
         # Gable roof along X.
