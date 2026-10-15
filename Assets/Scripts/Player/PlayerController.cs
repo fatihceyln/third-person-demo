@@ -45,6 +45,12 @@ namespace ThirdPersonDemo.Gameplay
         public bool IsCrouching => stance == Stance.Crouching;
         public bool IsProne => stance == Stance.Prone;
 
+        private void Start()
+        {
+            // isGrounded only becomes true after a Move, so without this the animator plays the fall pose on the first frame.
+            characterController.Move(Vector3.up * GroundedVerticalVelocity * Time.fixedDeltaTime);
+        }
+
         private void Update()
         {
             var moveInput = moveAction.action.ReadValue<Vector2>();
