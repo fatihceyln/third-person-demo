@@ -14,7 +14,7 @@
 | `Assets/Scripts/<Feature>/` | Scripts grouped by feature |
 | `Assets/Data/` | The project's ScriptableObject assets |
 | `Assets/Prefabs/` | Prefabs |
-| `Assets/Models/<Pack>/` | 3D models with their textures and license, one folder per source pack (e.g. `KenneyProtagonists`) |
+| `Assets/Models/<Pack>/` | 3D models with their textures and license, one folder per source pack (e.g. `KenneyProtagonists`). `Custom/` holds our own models built with Blender scripts in `Tools/agent/` (e.g. `make-well.py`); they reuse the Kenney `colormap.png` palette |
 | `Assets/Animations/` | Animator Controllers and our own animation clips (clips that come with a model pack stay in that pack) |
 | `Assets/Materials/`, `Assets/Shaders/` | Materials and shaders |
 | `Assets/Audio/` | Audio files |
@@ -23,6 +23,7 @@
 | `Assets/Settings/` | Unity/URP project settings assets only; game data does not go here |
 | `Assets/Editor/` | Editor-only tools, not included in builds (e.g. `ProjectValidator.cs`) |
 | `Tools/agent/` | Helper scripts for agents (outside `Assets/`, so Unity does not import them) |
+| `Tools/blender/` | `.blend` source files of our own models; kept outside `Assets/` so Unity does not import them |
 | `docs/screenshots/` | Screenshots used by `README.md` |
 
 - Put a new script in the matching feature folder; if none fits, create a new feature folder.
