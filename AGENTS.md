@@ -2,7 +2,8 @@
 
 ## Project overview
 
-- Third Person Demo: a third-person character demo built with Unity **6000.6.0f1**. Render pipeline: URP (Universal Renderer, `PC_Renderer` / `Mobile_Renderer`).
+- Third Person Demo: a third-person character demo built with Unity **6000.6.0f1**. Render pipeline: URP (Universal Renderer, `PC_RPAsset` + `PC_Renderer`).
+- Target platform: macOS only (Standalone). Do not add mobile, console or other platform settings or assets. The only quality level is `PC`.
 - The game design is not defined yet. When it is, describe the core loop, main scene and system wiring here.
 - Main scene: `Assets/Scenes/MainScene.unity` (the only scene in the Build Profiles scene list).
 - Game scripts live in the `ThirdPersonDemo.Gameplay` namespace; editor tools live in `ThirdPersonDemo.EditorTools` under `Assets/Editor/`.
