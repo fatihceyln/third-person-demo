@@ -1,30 +1,27 @@
 Shader "ThirdPersonDemo/ToonWater"
 {
+    // Flat toon water after https://roystan.net/articles/toon-water/: a depth color gradient with scrolling,
+    // distorted noise lines that thicken into foam near the shore. The noise is generated in the shader, in world
+    // space, so the pond and the well share its scale and need no textures.
+    // Needs the URP asset's Depth Texture.
     Properties
     {
-        _DeepColor ("Deep Color", Color) = (0.05, 0.62, 0.66, 1)
-        _ShallowColor ("Shallow Color", Color) = (0.2, 0.88, 0.82, 1)
-        _FoamColor ("Foam Color", Color) = (0.92, 1, 0.98, 1)
-        _Opacity ("Opacity", Range(0, 1)) = 0.85
-        _Radius ("Radius", Range(0.1, 0.5)) = 0.42
-        _EdgeWobble ("Edge Wobble", Range(0, 0.4)) = 0.12
-        _WobbleSeed ("Wobble Seed", Range(0, 10)) = 1.7
-        _FoamWidth ("Foam Width", Range(0, 0.2)) = 0.03
-        _ShallowWidth ("Shallow Width", Range(0, 0.3)) = 0.08
-        _WaterWobbleSpeed ("Water Wobble Speed", Range(0, 3)) = 0.8
-        _WaterWobble ("Water Wobble", Range(0, 0.05)) = 0.015
-        _ShineColor ("Shine Color", Color) = (0.75, 1, 0.95, 1)
-        _ShineScale ("Shine Scale", Range(1, 20)) = 5
-        _ShineWidth ("Shine Width", Range(0, 0.5)) = 0.12
-        _ShineSpeed ("Shine Speed", Range(0, 1)) = 0.12
-        _ShineWaveAmount ("Shine Wave Amount", Range(0, 0.5)) = 0.12
-        _ShineWaveFrequency ("Shine Wave Frequency", Range(0, 30)) = 9
-        _WallColor ("Pit Wall Top Color", Color) = (0.68, 0.44, 0.32, 1)
-        _WallDarkColor ("Pit Wall Bottom Color", Color) = (0.36, 0.22, 0.17, 1)
-        _RimColor ("Pit Rim Color", Color) = (0.3, 0.18, 0.14, 1)
-        _PitDepth ("Pit Depth", Range(0, 0.4)) = 0.1
-        _WaterInset ("Water Inset", Range(0, 0.2)) = 0.06
-        _RimWidth ("Rim Width", Range(0, 0.05)) = 0.012
+        _ShallowColor ("Shallow Color", Color) = (0.325, 0.807, 0.971, 0.725)
+        _DeepColor ("Deep Color", Color) = (0.086, 0.407, 1, 0.749)
+        _DepthMaxDistance ("Depth For Deep Color (m)", Range(0.05, 2)) = 0.5
+        _NoiseScale ("Noise Scale (per m)", Vector) = (1.2, 3, 0, 0)
+        _SurfaceNoiseCutoff ("Surface Noise Cutoff", Range(0, 1)) = 0.777
+        _SurfaceNoiseScroll ("Surface Noise Scroll", Vector) = (0.03, 0.03, 0, 0)
+        _DistortionScale ("Distortion Scale (per m)", Range(0.1, 10)) = 1.5
+        _DistortionAmount ("Distortion Amount", Range(0, 1)) = 0.27
+        _FoamColor ("Foam Color", Color) = (1, 1, 1, 1)
+        _FoamDistance ("Foam Distance (m)", Range(0, 1)) = 0.25
+        _ContactFoamDistance ("Contact Foam Distance (m)", Range(0, 1)) = 0.4
+        _ContactRadius ("Contact Radius (m)", Range(0.1, 2)) = 0.7
+        _RippleColor ("Ripple Color", Color) = (1, 1, 1, 0.8)
+        _RippleWidth ("Ripple Width (m)", Range(0.01, 0.3)) = 0.05
+        _RippleBreakup ("Ripple Breakup", Range(0, 0.9)) = 0.35
+        _ShadowStrength ("Shadow Strength", Range(0, 1)) = 0.35
     }
 
     SubShader
@@ -43,7 +40,6 @@ Shader "ThirdPersonDemo/ToonWater"
 
             Blend SrcAlpha OneMinusSrcAlpha
             ZWrite Off
-            Cull Off
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -51,211 +47,185 @@ Shader "ThirdPersonDemo/ToonWater"
             #pragma target 4.5
             #pragma multi_compile_instancing
             #pragma multi_compile _ DOTS_INSTANCING_ON
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
-                half4 _DeepColor;
                 half4 _ShallowColor;
+                half4 _DeepColor;
+                half _DepthMaxDistance;
+                float4 _NoiseScale;
+                half _SurfaceNoiseCutoff;
+                float4 _SurfaceNoiseScroll;
+                half _DistortionScale;
+                half _DistortionAmount;
                 half4 _FoamColor;
-                half _Opacity;
-                half _Radius;
-                half _EdgeWobble;
-                half _WobbleSeed;
-                half _FoamWidth;
-                half _ShallowWidth;
-                half _WaterWobbleSpeed;
-                half _WaterWobble;
-                half4 _ShineColor;
-                half _ShineScale;
-                half _ShineWidth;
-                half _ShineSpeed;
-                half _ShineWaveAmount;
-                half _ShineWaveFrequency;
-                half4 _WallColor;
-                half4 _WallDarkColor;
-                half4 _RimColor;
-                half _PitDepth;
-                half _WaterInset;
-                half _RimWidth;
+                half _FoamDistance;
+                half _ContactFoamDistance;
+                half _ContactRadius;
+                half4 _RippleColor;
+                half _RippleWidth;
+                half _RippleBreakup;
+                half _ShadowStrength;
             CBUFFER_END
 
             // The GPU Resident Drawer reads material values from here, not from the cbuffer.
             #ifdef UNITY_DOTS_INSTANCING_ENABLED
                 UNITY_DOTS_INSTANCING_START(MaterialPropertyMetadata)
-                    UNITY_DOTS_INSTANCED_PROP(float4, _DeepColor)
                     UNITY_DOTS_INSTANCED_PROP(float4, _ShallowColor)
+                    UNITY_DOTS_INSTANCED_PROP(float4, _DeepColor)
+                    UNITY_DOTS_INSTANCED_PROP(float, _DepthMaxDistance)
+                    UNITY_DOTS_INSTANCED_PROP(float4, _NoiseScale)
+                    UNITY_DOTS_INSTANCED_PROP(float, _SurfaceNoiseCutoff)
+                    UNITY_DOTS_INSTANCED_PROP(float4, _SurfaceNoiseScroll)
+                    UNITY_DOTS_INSTANCED_PROP(float, _DistortionScale)
+                    UNITY_DOTS_INSTANCED_PROP(float, _DistortionAmount)
                     UNITY_DOTS_INSTANCED_PROP(float4, _FoamColor)
-                    UNITY_DOTS_INSTANCED_PROP(float, _Opacity)
-                    UNITY_DOTS_INSTANCED_PROP(float, _Radius)
-                    UNITY_DOTS_INSTANCED_PROP(float, _EdgeWobble)
-                    UNITY_DOTS_INSTANCED_PROP(float, _WobbleSeed)
-                    UNITY_DOTS_INSTANCED_PROP(float, _FoamWidth)
-                    UNITY_DOTS_INSTANCED_PROP(float, _ShallowWidth)
-                    UNITY_DOTS_INSTANCED_PROP(float, _WaterWobbleSpeed)
-                    UNITY_DOTS_INSTANCED_PROP(float, _WaterWobble)
-                    UNITY_DOTS_INSTANCED_PROP(float4, _ShineColor)
-                    UNITY_DOTS_INSTANCED_PROP(float, _ShineScale)
-                    UNITY_DOTS_INSTANCED_PROP(float, _ShineWidth)
-                    UNITY_DOTS_INSTANCED_PROP(float, _ShineSpeed)
-                    UNITY_DOTS_INSTANCED_PROP(float, _ShineWaveAmount)
-                    UNITY_DOTS_INSTANCED_PROP(float, _ShineWaveFrequency)
-                    UNITY_DOTS_INSTANCED_PROP(float4, _WallColor)
-                    UNITY_DOTS_INSTANCED_PROP(float4, _WallDarkColor)
-                    UNITY_DOTS_INSTANCED_PROP(float4, _RimColor)
-                    UNITY_DOTS_INSTANCED_PROP(float, _PitDepth)
-                    UNITY_DOTS_INSTANCED_PROP(float, _WaterInset)
-                    UNITY_DOTS_INSTANCED_PROP(float, _RimWidth)
+                    UNITY_DOTS_INSTANCED_PROP(float, _FoamDistance)
+                    UNITY_DOTS_INSTANCED_PROP(float, _ContactFoamDistance)
+                    UNITY_DOTS_INSTANCED_PROP(float, _ContactRadius)
+                    UNITY_DOTS_INSTANCED_PROP(float4, _RippleColor)
+                    UNITY_DOTS_INSTANCED_PROP(float, _RippleWidth)
+                    UNITY_DOTS_INSTANCED_PROP(float, _RippleBreakup)
+                    UNITY_DOTS_INSTANCED_PROP(float, _ShadowStrength)
                 UNITY_DOTS_INSTANCING_END(MaterialPropertyMetadata)
 
-                #define _DeepColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _DeepColor)
                 #define _ShallowColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _ShallowColor)
+                #define _DeepColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _DeepColor)
+                #define _DepthMaxDistance UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _DepthMaxDistance)
+                #define _NoiseScale UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _NoiseScale)
+                #define _SurfaceNoiseCutoff UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _SurfaceNoiseCutoff)
+                #define _SurfaceNoiseScroll UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _SurfaceNoiseScroll)
+                #define _DistortionScale UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _DistortionScale)
+                #define _DistortionAmount UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _DistortionAmount)
                 #define _FoamColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _FoamColor)
-                #define _Opacity UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _Opacity)
-                #define _Radius UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _Radius)
-                #define _EdgeWobble UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _EdgeWobble)
-                #define _WobbleSeed UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _WobbleSeed)
-                #define _FoamWidth UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _FoamWidth)
-                #define _ShallowWidth UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ShallowWidth)
-                #define _WaterWobbleSpeed UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _WaterWobbleSpeed)
-                #define _WaterWobble UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _WaterWobble)
-                #define _ShineColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _ShineColor)
-                #define _ShineScale UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ShineScale)
-                #define _ShineWidth UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ShineWidth)
-                #define _ShineSpeed UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ShineSpeed)
-                #define _ShineWaveAmount UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ShineWaveAmount)
-                #define _ShineWaveFrequency UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ShineWaveFrequency)
-                #define _WallColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _WallColor)
-                #define _WallDarkColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _WallDarkColor)
-                #define _RimColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _RimColor)
-                #define _PitDepth UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _PitDepth)
-                #define _WaterInset UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _WaterInset)
-                #define _RimWidth UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _RimWidth)
+                #define _FoamDistance UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _FoamDistance)
+                #define _ContactFoamDistance UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ContactFoamDistance)
+                #define _ContactRadius UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ContactRadius)
+                #define _RippleColor UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _RippleColor)
+                #define _RippleWidth UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _RippleWidth)
+                #define _RippleBreakup UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _RippleBreakup)
+                #define _ShadowStrength UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float, _ShadowStrength)
             #endif
 
-            // Steps used to find where the view ray meets the pit wall.
-            #define PIT_MARCH_STEPS 8
-            // Caps how far the view ray can slide sideways, so grazing camera angles do not smear the pit.
-            #define PIT_MAX_SHIFT 0.45
+            // Set by WaterRipples.cs. Must match MaxRipples there.
+            #define WATER_RIPPLE_COUNT 16
+            // xy: world XZ where the ripple started, z: start time.
+            float4 _WaterRipples[WATER_RIPPLE_COUNT];
+            // x: current time, y: ripple lifetime, z: ripple speed. Zero outside Play Mode, which hides all ripples.
+            float4 _WaterRippleSettings;
+            // xy: world XZ of the player, z: how much the player is in the water (0..1).
+            float4 _WaterContact;
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
-                float2 uv : TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
             {
                 float4 positionCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                float3 viewOS : TEXCOORD1;
+                float3 positionWS : TEXCOORD0;
             };
+
+            // Shader Graph's Gradient Noise, standing in for the article's Perlin noise texture.
+            float2 GradientNoiseDirection(float2 position)
+            {
+                position = position % 289.0;
+                float hash = (34.0 * position.x + 1.0) * position.x % 289.0 + position.y;
+                hash = (34.0 * hash + 1.0) * hash % 289.0;
+                hash = frac(hash / 41.0) * 2.0 - 1.0;
+                return normalize(float2(hash - floor(hash + 0.5), abs(hash) - 0.5));
+            }
+
+            float GradientNoise(float2 position)
+            {
+                float2 cell = floor(position);
+                float2 local = frac(position);
+                float d00 = dot(GradientNoiseDirection(cell), local);
+                float d01 = dot(GradientNoiseDirection(cell + float2(0.0, 1.0)), local - float2(0.0, 1.0));
+                float d10 = dot(GradientNoiseDirection(cell + float2(1.0, 0.0)), local - float2(1.0, 0.0));
+                float d11 = dot(GradientNoiseDirection(cell + float2(1.0, 1.0)), local - float2(1.0, 1.0));
+                local = local * local * local * (local * (local * 6.0 - 15.0) + 10.0);
+                return lerp(lerp(d00, d01, local.y), lerp(d10, d11, local.y), local.x) + 0.5;
+            }
+
+            // Lays top over bottom with normal alpha blending, as in the article.
+            half4 AlphaBlend(half4 top, half4 bottom)
+            {
+                half3 color = top.rgb * top.a + bottom.rgb * (1.0 - top.a);
+                half alpha = top.a + bottom.a * (1.0 - top.a);
+                return half4(color / max(alpha, 1e-4), alpha);
+            }
 
             Varyings vert(Attributes input)
             {
                 Varyings output;
                 UNITY_SETUP_INSTANCE_ID(input);
-                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
-                output.uv = input.uv;
-                // Object space is used so the pit follows the quad's rotation and position.
-                output.viewOS = TransformWorldToObject(GetCameraPositionWS()) - input.positionOS.xyz;
+                output.positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                output.positionCS = TransformWorldToHClip(output.positionWS);
                 return output;
-            }
-
-            // Positive inside the outline, zero on it. Static on purpose: the pit must not move, only the water does.
-            float OutlineDistance(float2 uv)
-            {
-                float2 centered = uv - 0.5;
-                float angle = atan2(centered.y, centered.x);
-
-                // Whole-number angle frequencies keep the outline seamless where atan2 wraps.
-                float wobble = sin(angle * 3.0 + _WobbleSeed) * 0.5
-                    + sin(angle * 5.0 + _WobbleSeed * 1.7) * 0.3
-                    + sin(angle * 7.0 + _WobbleSeed * 2.3) * 0.2;
-                float edgeRadius = _Radius * (1.0 + wobble * _EdgeWobble);
-
-                return edgeRadius - length(centered);
-            }
-
-            // Small ripple along the waterline. It stays smaller than the water inset so the water never reaches the rim.
-            float WaterRipple(float2 uv)
-            {
-                float2 centered = uv - 0.5;
-                float angle = atan2(centered.y, centered.x);
-                float phase = _Time.y * _WaterWobbleSpeed;
-                float ripple = sin(angle * 3.0 + _WobbleSeed + phase) * 0.5
-                    + sin(angle * 5.0 + _WobbleSeed * 1.7 - phase * 1.3) * 0.3
-                    + sin(angle * 7.0 + _WobbleSeed * 2.3 + phase * 0.7) * 0.2;
-                return ripple * _WaterWobble;
             }
 
             half4 frag(Varyings input) : SV_Target
             {
-                float2 uv = input.uv;
+                float2 screenUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                float sceneDepth = LinearEyeDepth(SampleSceneDepth(screenUV), _ZBufferParams);
+                float surfaceDepth = -TransformWorldToView(input.positionWS).z;
+                float waterDepth = max(sceneDepth - surfaceDepth, 0.0);
+                half4 waterColor = lerp(_ShallowColor, _DeepColor, saturate(waterDepth / _DepthMaxDistance));
 
-                // The camera looks into the pit along this slide; the quad's local -Z is up.
-                float2 shift = input.viewOS.xy / min(input.viewOS.z, -1e-3) * _PitDepth;
-                shift *= min(1.0, PIT_MAX_SHIFT / max(length(shift), 1e-4));
+                // The foam band is wider around the player's legs and breathes a little, so wading reads as moving water.
+                float2 contactOffset = input.positionWS.xz - _WaterContact.xy;
+                float contactFactor = _WaterContact.z * (1.0 - smoothstep(_ContactRadius * 0.5, _ContactRadius, length(contactOffset)));
+                float contactFoamDistance = _ContactFoamDistance
+                    * (0.8 + 0.2 * sin(_WaterRippleSettings.x * 4.0 + atan2(contactOffset.y, contactOffset.x) * 5.0));
+                float foamDistance = lerp(_FoamDistance, contactFoamDistance, contactFactor);
 
-                // The walls slope inward, so the water outline is smaller than the opening.
-                float openingDistance = OutlineDistance(uv);
-                float2 waterUV = uv + shift;
-                float waterDistance = OutlineDistance(waterUV) - _WaterInset + WaterRipple(waterUV);
+                // Shallow water lowers the cutoff, so the thin noise lines merge into foam at the shore.
+                float foamFactor = saturate(waterDepth / max(foamDistance, 1e-4));
+                float cutoff = foamFactor * _SurfaceNoiseCutoff;
 
-                // Screen-space width keeps the cartoon edges crisp at any distance.
-                float openingWidth = max(fwidth(openingDistance), 1e-5);
-                float waterWidth = max(fwidth(waterDistance), 1e-5);
+                float2 distortionPosition = input.positionWS.xz * _DistortionScale;
+                float2 distortion = float2(GradientNoise(distortionPosition), GradientNoise(distortionPosition + 17.3)) * 2.0 - 1.0;
+                float2 noisePosition = input.positionWS.xz * _NoiseScale.xy + _Time.y * _SurfaceNoiseScroll.xy + distortion * _DistortionAmount;
+                float noise = GradientNoise(noisePosition);
+                float edge = max(fwidth(noise), 1e-4);
+                half foam = smoothstep(cutoff - edge, cutoff + edge, noise);
 
-                // Find how deep the view ray hits the wall; 1 means it reaches the water.
-                float wallFraction = 1.0;
-                bool wallFound = false;
+                half4 color = AlphaBlend(half4(_FoamColor.rgb, _FoamColor.a * foam), waterColor);
+
+                // Rings that spread out from where the player walked.
+                float ripple = 0.0;
                 [unroll]
-                for (int stepIndex = 1; stepIndex <= PIT_MARCH_STEPS; stepIndex++)
+                for (int rippleIndex = 0; rippleIndex < WATER_RIPPLE_COUNT; rippleIndex++)
                 {
-                    float fraction = (float)stepIndex / PIT_MARCH_STEPS;
-                    float rayDistance = OutlineDistance(uv + shift * fraction) - _WaterInset * fraction;
-                    if (!wallFound && rayDistance <= 0.0)
+                    float4 rippleData = _WaterRipples[rippleIndex];
+                    float age = _WaterRippleSettings.x - rippleData.z;
+                    if (age >= 0.0 && age < _WaterRippleSettings.y)
                     {
-                        wallFraction = fraction;
-                        wallFound = true;
+                        float radius = age * _WaterRippleSettings.z;
+                        float2 rippleOffset = input.positionWS.xz - rippleData.xy;
+                        float distanceToRing = abs(length(rippleOffset) - radius);
+                        float ring = 1.0 - smoothstep(_RippleWidth * 0.5, _RippleWidth, distanceToRing);
+                        // Drop some arcs, picked per ripple by its start time, so the rings read as broken foam.
+                        float arc = floor((atan2(rippleOffset.y, rippleOffset.x) / TWO_PI + 0.5) * 10.0);
+                        float arcKeep = frac(sin(arc * 78.233 + rippleData.z * 12.9898) * 43758.5453);
+                        ring *= step(_RippleBreakup, arcKeep);
+                        ripple = max(ripple, ring * (1.0 - age / _WaterRippleSettings.y));
                     }
                 }
+                color = AlphaBlend(half4(_RippleColor.rgb, _RippleColor.a * ripple), color);
 
-                // Three flat bands, lighter at the top and darker near the water.
-                float wallBand = floor(saturate(wallFraction) * 2.999) / 2.0;
-                half3 wallColor = lerp(_WallColor.rgb, _WallDarkColor.rgb, wallBand);
-
-                half3 waterColor = _DeepColor.rgb;
-                waterColor = waterDistance < _FoamWidth + _ShallowWidth ? _ShallowColor.rgb : waterColor;
-                waterColor = waterDistance < _FoamWidth ? _FoamColor.rgb : waterColor;
-
-                // Diagonal bands that slide across the water; the sine bends them so they read as water.
-                float2 waterCentered = waterUV - 0.5;
-                float2 shineDirection = float2(0.7071, 0.7071);
-                float2 shineSideways = float2(-0.7071, 0.7071);
-                float shineCoord = dot(waterCentered, shineDirection) * _ShineScale
-                    + sin(dot(waterCentered, shineSideways) * _ShineWaveFrequency + _Time.y * _ShineSpeed * 6.0) * _ShineWaveAmount
-                    - _Time.y * _ShineSpeed;
-                float shinePhase = frac(shineCoord);
-                float shineEdge = max(fwidth(shineCoord), 1e-4);
-                float shine = smoothstep(0.0, shineEdge, shinePhase)
-                    * (1.0 - smoothstep(_ShineWidth, _ShineWidth + shineEdge, shinePhase));
-                // Keep the foam rim clean.
-                float shineArea = saturate((waterDistance - _FoamWidth) / waterWidth);
-                waterColor = lerp(waterColor, _ShineColor.rgb, shine * shineArea * _ShineColor.a);
-
-                float waterMask = saturate(waterDistance / waterWidth);
-                half3 pitColor = lerp(wallColor, waterColor, waterMask);
-                float pitAlpha = lerp(1.0, _Opacity, waterMask);
-
-                // The rim is a thin outline just outside the opening that separates the pit from the floor.
-                float openingMask = saturate(openingDistance / openingWidth);
-                float rimMask = saturate((openingDistance + _RimWidth) / openingWidth);
-                half3 color = lerp(_RimColor.rgb, pitColor, openingMask);
-                float alpha = lerp(rimMask, pitAlpha, openingMask);
-
-                return half4(color, alpha);
+                // Unlit like the article, but shadows still darken it so the water does not glow under trees.
+                half shadow = GetMainLight(TransformWorldToShadowCoord(input.positionWS)).shadowAttenuation;
+                color.rgb *= lerp(1.0, shadow, _ShadowStrength);
+                return color;
             }
             ENDHLSL
         }

@@ -30,9 +30,13 @@ namespace ThirdPersonDemo.Gameplay
         [SerializeField, Min(0f)] private float jumpHeight = 1.5f;
         [SerializeField, Min(0.01f)] private float gravity = 20f;
         [SerializeField, Min(0f)] private float edgeSlideSpeed = 3f;
+        [SerializeField, Range(0f, 1f)] private float waterSpeedMultiplier = 0.5f;
         [SerializeField] private LayerMask groundLayers;
+        [SerializeField] private LayerMask waterLayers;
 
         private float verticalVelocity;
+        // A count, not a flag, so leaving one water trigger while still inside another keeps the slowdown.
+        private int waterTriggerCount;
         private Vector3 groundNormal = Vector3.up;
         // Set by the selected character through SetBodySize, so each character has its own capsule.
         private float standingHeight;
@@ -44,6 +48,9 @@ namespace ThirdPersonDemo.Gameplay
         public bool IsGrounded => characterController.isGrounded;
         public bool IsCrouching => stance == Stance.Crouching;
         public bool IsProne => stance == Stance.Prone;
+        public bool IsInWater => waterTriggerCount > 0;
+        // The top of the water trigger is the water surface, so effects can sit on it.
+        public float WaterSurfaceHeight { get; private set; }
 
         private void Start()
         {
@@ -71,6 +78,12 @@ namespace ThirdPersonDemo.Gameplay
                 Stance.Prone => crawlSpeed,
                 _ => sprintAction.action.IsPressed() ? sprintSpeed : moveSpeed,
             };
+
+            if (IsInWater)
+            {
+                speed *= waterSpeedMultiplier;
+            }
+
             // Movement follows the camera's heading so W always walks away from the camera.
             var cameraYaw = Quaternion.Euler(0f, cameraTransform.eulerAngles.y, 0f);
             var moveDirection = cameraYaw * new Vector3(moveInput.x, 0f, moveInput.y);
@@ -114,6 +127,23 @@ namespace ThirdPersonDemo.Gameplay
             if (hit.point.y <= bottomSphereHeight && hit.normal.y > groundNormal.y)
             {
                 groundNormal = hit.normal;
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (IsWater(other))
+            {
+                waterTriggerCount++;
+                WaterSurfaceHeight = other.bounds.max.y;
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (IsWater(other))
+            {
+                waterTriggerCount--;
             }
         }
 
@@ -171,6 +201,11 @@ namespace ThirdPersonDemo.Gameplay
             // The capsule keeps its bottom where it is so the feet stay on the ground.
             var bottom = characterController.center + Vector3.down * (characterController.height / 2f);
             return bottom + Vector3.up * (height / 2f);
+        }
+
+        private bool IsWater(Collider other)
+        {
+            return (waterLayers.value & (1 << other.gameObject.layer)) != 0;
         }
 
         private bool IsOnEdge()

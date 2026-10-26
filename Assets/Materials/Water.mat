@@ -23,60 +23,26 @@ Material:
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+    m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _AddPrecomputedVelocity: 0
-    - _AlphaClip: 0
-    - _AlphaToMask: 0
-    - _Blend: 0
-    - _BlendOp: 0
-    - _Cull: 2
-    - _Cutoff: 0.5
-    - _DstBlend: 0
-    - _DstBlendAlpha: 0
-    - _EdgeWobble: 0.12
-    - _EdgeWobbleSpeed: 0.8
-    - _FoamWidth: 0.03
-    - _Opacity: 0.85
-    - _PitDepth: 0.102
-    - _QueueOffset: 0
-    - _Radius: 0.42
-    - _RimWidth: 0.012
-    - _SampleGI: 0
-    - _ShallowWidth: 0.08
-    - _ShineScale: 5
-    - _ShineSpeed: 0.12
-    - _ShineWaveAmount: 0.12
-    - _ShineWaveFrequency: 9
-    - _ShineWidth: 0.12
-    - _SrcBlend: 1
-    - _SrcBlendAlpha: 1
-    - _Surface: 0
-    - _WaterInset: 0.06
-    - _WaterWobble: 0.015
-    - _WaterWobbleSpeed: 1.51
-    - _WobbleSeed: 1.7
-    - _XRMotionVectorsPass: 1
-    - _ZWrite: 1
+    - _ContactFoamDistance: 0.4
+    - _ContactRadius: 0.7
+    - _DepthMaxDistance: 0.5
+    - _DistortionAmount: 0.27
+    - _DistortionScale: 1.5
+    - _FoamDistance: 0.12
+    - _RippleBreakup: 0.35
+    - _RippleWidth: 0.05
+    - _ShadowStrength: 0.35
+    - _SurfaceNoiseCutoff: 0.777
     m_Colors:
-    - _BaseColor: {r: 0.1, g: 0.85, b: 0.8, a: 1}
-    - _Color: {r: 0.09999997, g: 0.85, b: 0.8, a: 1}
-    - _DeepColor: {r: 0.049999982, g: 0.62, b: 0.65999997, a: 1}
-    - _FoamColor: {r: 0.92, g: 1, b: 0.97999996, a: 1}
-    - _RimColor: {r: 0.29999998, g: 0.17999998, b: 0.13999996, a: 1}
-    - _ShallowColor: {r: 0.19999996, g: 0.88, b: 0.82, a: 1}
-    - _ShineColor: {r: 0.75, g: 1, b: 0.95, a: 1}
-    - _WallColor: {r: 0.68, g: 0.43999997, b: 0.31999996, a: 1}
-    - _WallDarkColor: {r: 0.35999998, g: 0.21999997, b: 0.16999996, a: 1}
+    - _DeepColor: {r: 0.086, g: 0.407, b: 1, a: 0.749}
+    - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
+    - _NoiseScale: {r: 1.2, g: 3, b: 0, a: 0}
+    - _RippleColor: {r: 1, g: 1, b: 1, a: 0.8}
+    - _ShallowColor: {r: 0.325, g: 0.807, b: 0.971, a: 0.725}
+    - _SurfaceNoiseScroll: {r: 0.03, g: 0.03, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &6962394443537614333

@@ -5,15 +5,19 @@ Run with Blender in background mode:
 
 Every face is UV-mapped to one flat color cell of the Kenney Mini Arena colormap, so the well
 shares the palette (and the material) of the rest of the arena. The water is the exception: it gets
-its own "water" material and UVs that span the shaft opening, so a toon water shader can fill it.
+its own "water" material, an even mesh of small triangles for the flat-shaded waves, and a second UV
+channel with each vertex's distance to the shaft wall in meters, which the water shader uses to calm
+the waves at the wall.
 """
 import math
 import os
+import random
 import sys
 
 import bmesh
 import bpy
 from mathutils import Vector
+from mathutils.geometry import delaunay_2d_cdt
 
 ARGS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 OUT_FBX = ARGS[0]
@@ -40,6 +44,12 @@ RIM_RADIUS = 1.05
 RIM_HOLE_RADIUS = 0.74
 RIM_HEIGHT = 0.12
 WATER_LEVEL = 0.65
+# Deep enough below the water that the depth-based water shader shows its deep color.
+SHAFT_FLOOR = 0.1
+WATER_GRID_SPACING = 0.18
+WATER_GRID_JITTER = 0.05
+# Keeps interior points away from the outline so no sliver triangles form there.
+WATER_GRID_MARGIN = 0.08
 POST_SIZE = 0.16
 POST_X = 0.9
 POST_TOP = 2.05
@@ -141,12 +151,60 @@ def make_part(name, material, build):
     return obj
 
 
-def planar_uv(bm, half_extent):
-    """Top-down projection that maps the square [-half_extent, half_extent] onto the UV unit square."""
+def shaft_wall_distance(x, y):
+    """Distance from a point inside the shaft opening to its nearest octagon edge."""
+    apothem = WELL_HOLE_RADIUS * math.cos(math.pi / SIDES)
+    # circle_polygon is rotated by half a side, so the edge normals point along whole multiples of the side angle.
+    return apothem - max(x * math.cos(math.tau * index / SIDES) + y * math.sin(math.tau * index / SIDES)
+                         for index in range(SIDES))
+
+
+def add_water_slab(bm, outline, thickness):
+    """Top made of even, slightly irregular triangles so flat-shaded waves do not form spokes from one corner."""
+    # Fixed seed, so every run of the script produces the same mesh.
+    jitter = random.Random(7)
+    interior = []
+    steps = int(WELL_HOLE_RADIUS / WATER_GRID_SPACING) + 2
+    for row in range(-steps, steps + 1):
+        for column in range(-steps, steps + 1):
+            # Every other row is shifted by half a step, which gives roughly equilateral triangles.
+            x = (column + (row % 2) * 0.5) * WATER_GRID_SPACING + jitter.uniform(-WATER_GRID_JITTER, WATER_GRID_JITTER)
+            y = row * WATER_GRID_SPACING * 0.866 + jitter.uniform(-WATER_GRID_JITTER, WATER_GRID_JITTER)
+            if shaft_wall_distance(x, y) > WATER_GRID_MARGIN:
+                interior.append((x, y))
+
+    count = len(outline)
+    points = [Vector((point[0], point[1])) for point in outline] + [Vector(point) for point in interior]
+    # Output type 1 keeps only the triangles inside the outline.
+    out_points, _, out_faces, out_origins, _, _ = delaunay_2d_cdt(points, [], [list(range(count))], 1, 1e-6)
+    level = outline[0][2]
+    verts = [bm.verts.new((point.x, point.y, level)) for point in out_points]
+    rim = [None] * count
+    for index, origins in enumerate(out_origins):
+        for origin in origins:
+            if origin < count:
+                rim[origin] = verts[index]
+    faces = []
+    for face in out_faces:
+        corners = [verts[index] for index in face]
+        # Counterclockwise from above, so the surface faces +Z.
+        if (corners[1].co - corners[0].co).cross(corners[2].co - corners[0].co).z < 0.0:
+            corners.reverse()
+        faces.append(bm.faces.new(corners))
+
+    bottom = [bm.verts.new((point[0], point[1], level - thickness)) for point in outline]
+    faces.append(bm.faces.new(list(reversed(bottom))))
+    for index in range(count):
+        next_index = (index + 1) % count
+        faces.append(bm.faces.new((bottom[index], bottom[next_index], rim[next_index], rim[index])))
+
     uv_layer = bm.loops.layers.uv.verify()
-    for face in bm.faces:
+    wall_layer = bm.loops.layers.uv.new("shore")
+    for face in faces:
         for loop in face.loops:
-            loop[uv_layer].uv = (loop.vert.co.x / (2 * half_extent) + 0.5, loop.vert.co.y / (2 * half_extent) + 0.5)
+            position = loop.vert.co
+            loop[uv_layer].uv = (position.x / (2 * WELL_HOLE_RADIUS) + 0.5, position.y / (2 * WELL_HOLE_RADIUS) + 0.5)
+            loop[wall_layer].uv = (max(shaft_wall_distance(position.x, position.y), 0.0), 0.0)
 
 
 def build_well():
@@ -157,15 +215,13 @@ def build_well():
 
     def stone_body(bm):
         # Solid block under the shaft, so the underside is one flat closed surface.
-        shaft_floor = WATER_LEVEL - 0.1
-        add_prism(bm, circle_polygon(WELL_RADIUS, 0.0), (0.0, 0.0, shaft_floor), "stone")
-        add_ring_prism(bm, WELL_RADIUS, WELL_HOLE_RADIUS, shaft_floor, WELL_HEIGHT, "stone")
+        add_prism(bm, circle_polygon(WELL_RADIUS, 0.0), (0.0, 0.0, SHAFT_FLOOR), "stone")
+        add_ring_prism(bm, WELL_RADIUS, WELL_HOLE_RADIUS, SHAFT_FLOOR, WELL_HEIGHT, "stone")
         add_ring_prism(bm, RIM_RADIUS, RIM_HOLE_RADIUS, WELL_HEIGHT, rim_bottom, "stone_light")
 
     def water(bm):
-        # Fills the shaft opening exactly; the UVs span the octagon's bounding square for the toon water shader.
-        add_prism(bm, circle_polygon(WELL_HOLE_RADIUS, WATER_LEVEL - 0.05), (0.0, 0.0, 0.05), "stone")
-        planar_uv(bm, WELL_HOLE_RADIUS)
+        # Fills the shaft opening exactly. A thin closed slab, so the imported collider stays a closed volume.
+        add_water_slab(bm, circle_polygon(WELL_HOLE_RADIUS, WATER_LEVEL), 0.05)
 
     def posts(bm):
         for side in (-1.0, 1.0):
