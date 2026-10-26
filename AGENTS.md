@@ -94,10 +94,10 @@
 
 - Unity Editor operations are done with the `unity command` CLI: scene, GameObject, component and Inspector edits, compilation, asset import and reading the Console.
 - Do not hand-edit scene or prefab files as raw text; make changes through the Unity Editor.
-- For fields that `set_component_properties` cannot assign, such as structs or arrays, use `SerializedObject` inside `eval`.
+- For fields that `component set_properties` cannot assign, such as structs or arrays, use `SerializedObject` inside `script eval`.
 - Before editing a scene, check that the Editor is not in Play Mode (`EditorApplication.isPlayingOrWillChangePlaymode`). Scene changes made in Play Mode are lost.
 - After editing a scene, save it (`EditorSceneManager.SaveScene`); unsaved scene changes are lost.
-- An `eval` call may have completed even if it timed out. Check the result on the file system or in the Editor before running it again.
+- A `script eval` call may have completed even if it timed out. Check the result on the file system or in the Editor before running it again.
 - `AssetDatabase.SaveAssets` can re-save unrelated assets (e.g. files in `Assets/Settings/`). Check with `git status` after the work and revert unwanted changes.
 - After a change, verify it with `Tools/agent/unity-check.py` (see Verification).
 

@@ -53,12 +53,12 @@ def main():
 
 
 def mark():
-    console = run_unity("console", "--tail", "1")
+    console = run_unity("console", "get", "--tail", "1")
 
     if console is None:
         return 2
 
-    state = {"cursor": console["cursor"], "files": dirty_file_hashes()}
+    state = {"cursor": console["cursor"], "session": console["session"], "files": dirty_file_hashes()}
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     STATE_FILE.write_text(json.dumps(state, indent=2))
     print(f"Marked. Console cursor: {state['cursor']}, already modified files: {len(state['files'])}")
@@ -97,7 +97,7 @@ def check():
     if playing:
         print("\nNote: the Editor is in Play Mode; scene changes made now are lost when it exits.")
 
-    errors, warnings = new_console_entries(state["cursor"])
+    errors, warnings = new_console_entries(state["cursor"], state["session"])
 
     if not compile_failed:
         # Compile errors logged earlier in the task were fixed by a later successful compile.
@@ -161,8 +161,13 @@ def wait_for_unity():
     return False
 
 
-def new_console_entries(cursor):
-    console = run_unity("console", "--since", str(cursor)) or {"entries": []}
+def new_console_entries(cursor, session):
+    console = run_unity("console", "get", "--since", str(cursor), "--since_session", session) or {"entries": []}
+
+    # A cursor from an earlier Editor session is refused and the recent tail comes back instead.
+    if console.get("reset"):
+        print("Note: the Console session changed since mark (Editor restarted?); entries may predate the change.")
+
     entries = [
         entry for entry in console["entries"]
         if not any(ignored in entry["message"] for ignored in IGNORED_MESSAGES)
@@ -200,7 +205,7 @@ def file_hash(path):
 
 
 def run_eval(code, quiet=False, timeout=15):
-    response = run_unity("eval", code, quiet=quiet, timeout=timeout)
+    response = run_unity("script", "eval", code, quiet=quiet, timeout=timeout)
     return None if response is None else response.get("result")
 
 
